@@ -253,4 +253,47 @@ msmoneyrep = {
     }
 }
 
-all_mappings = {'Yodlee':yodlee, 'Credit Union':cu, 'UBS':ubs, 'MS Money Report (CSV)':msmoneyrep }
+def tks_toQIFDate(date):
+    return datetime.strptime(date,'%d.%m.%Y %H:%M:%S').strftime('%m/%d/%Y')
+
+def tks_toOFXDate(date):
+    return datetime.strptime(date,'%d.%m.%Y %H:%M:%S').strftime('%Y%m%d')
+
+def tks_toAmount(type_,amount):
+    if type_ == 'Debit':
+        return '-' + amount
+    elif type_ == 'Credit':
+        return '+' + amount
+
+tks = {
+    '_params':{
+        'delimiter': ';',
+        'skip_last': 0
+    },
+    'OFX':{
+        'skip':lambda row,grid: False,
+        'BANKID':lambda row,grid: 'TKS',
+        'ACCTID':lambda row,grid: fromCSVCol(row,grid,'Description'),
+        'DTPOSTED':lambda row,grid: tks_toOFXDate(fromCSVCol(row,grid,'Value date')),
+        'TRNAMT':lambda row,grid: tks_toAmount(fromCSVCol(row,grid,'Type'),fromCSVCol(row,grid,'Amount')),
+        'FITID':lambda row,grid: row,
+        'PAYEE':lambda row,grid: '',
+        'MEMO':lambda row,grid: fromCSVCol(row,grid,'Description'),
+        'CURDEF':lambda row,grid: fromCSVCol(row,grid,'Currency'),
+        'CHECKNUM':lambda row,grid: ''
+    },
+    'QIF':{
+        'split':lambda row,grid:False,
+        'Account':lambda row,grid: 'TCS',
+        'AccountDscr':lambda row,grid: 'Tinkoff Credit Systems',
+        'Date':lambda row,grid: tks_toQIFDate(fromCSVCol(row,grid,'Value date')),
+        'Payee':lambda row,grid: '',
+        'Memo':lambda row,grid: fromCSVCol(row,grid,'Description'),
+        'Category':lambda row,grid: fromCSVCol(row,grid,'Category'),
+        'Class':lambda row,grid:'',
+        'Amount':lambda row,grid: tks_toAmount(fromCSVCol(row,grid,'Type'),fromCSVCol(row,grid,'Amount')),
+        'Number':lambda row,grid: ''
+    }
+}
+
+all_mappings = {'Tinkoff':tks, 'Yodlee':yodlee, 'Credit Union':cu, 'UBS':ubs, 'MS Money Report (CSV)':msmoneyrep }
