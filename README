@@ -23,6 +23,10 @@ directory as csv2ofx_custom.py.  The file may also be placed in the current
 working directory.  After creating a copy of the file, add or change the mappings
 to suite your needs.  See mappings.py for mapping documentation.
 
+Currently header must be  inserted to TCS csv file manually.
+Header sample:
+Value date;Writing date;Type;Status;nom;cnom;Amount;Currency;Category;Description
+
 Enjoy!
 
 Contributors
